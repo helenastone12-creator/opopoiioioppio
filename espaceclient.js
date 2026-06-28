@@ -62,7 +62,7 @@ function ecLogin(){
 
   // Ouvre la session
   ecSetSession();
-  setTimeout(function(){ window.location.href='espace-client.html'; }, 300);
+  setTimeout(function(){ window.location.href='espaceclient.html'; }, 300);
 }
 
 // ── Inscription ──
@@ -104,7 +104,7 @@ function ecRegister(){
   };
   ecSetUser(user);
   ecSetSession();
-  setTimeout(function(){ window.location.href='espace-client.html'; }, 300);
+  setTimeout(function(){ window.location.href='espaceclient.html'; }, 300);
 }
 
 // ── Déconnexion ──
@@ -183,6 +183,7 @@ function ecToggleSolde(){
 function ecGetTx(){ try{ return JSON.parse(localStorage.getItem('ec_tx')||'[]'); }catch(e){ return []; } }
 function ecAddTx(tx){
   var list = ecGetTx();
+  if(!tx.ts) tx.ts = Date.now();
   list.unshift(tx);
   if(list.length > 30) list = list.slice(0,30);
   localStorage.setItem('ec_tx', JSON.stringify(list));
@@ -202,6 +203,7 @@ function ecTxColor(label){
   return EC_AVATAR_COLORS[i];
 }
 var EC_TX_SHOW_ALL = false;
+var EC_TX_FILTER = 'tous';
 
 function ecToggleTxAll(e){
   if(e) e.preventDefault();
@@ -211,12 +213,31 @@ function ecToggleTxAll(e){
   if(btn) btn.textContent = EC_TX_SHOW_ALL ? 'Réduire' : 'Tout afficher';
 }
 
+function ecFilterTxList(list){
+  var now = new Date();
+  return list.filter(function(tx){
+    if(EC_TX_FILTER==='tous') return true;
+    if(EC_TX_FILTER==='depot') return tx.type==='depot';
+    if(EC_TX_FILTER==='virement') return tx.type==='virement';
+    if(EC_TX_FILTER==='mois'){
+      var d = tx.ts ? new Date(tx.ts) : null;
+      return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+    }
+    return true;
+  });
+}
+
 function ecRenderTx(){
-  var list = ecGetTx();
+  var list = ecFilterTxList(ecGetTx());
   var container = document.getElementById('ec-tx-list');
   var empty = document.getElementById('ec-tx-empty');
   if(!container) return;
-  if(!list.length){ if(empty) empty.style.display=''; return; }
+  if(!list.length){
+    container.innerHTML = '<div class="ec-tx-empty">'
+      + (EC_TX_FILTER==='tous' ? 'Aucune opération pour le moment.' : 'Aucune transaction dans cette catégorie.')
+      + '</div>';
+    return;
+  }
   if(empty) empty.style.display='none';
   var hidden = ecSoldeHidden();
   var displayed = EC_TX_SHOW_ALL ? list : list.slice(0,5);
@@ -614,10 +635,11 @@ function ecInitSpendingChart(){
 
   var cats={};
   var colors=['#0B5E8A','#0B9E8A','#ff6b5c','#F59E0B','#7C3AED','#059669'];
+  var LABELS={virement:'Virements',convert:'Conversions'};
   txList.forEach(function(tx){
-    if(tx.montant<0){
-      var c=tx.categorie||tx.type||'Autre';
-      cats[c]=(cats[c]||0)+Math.abs(tx.montant);
+    if(tx.type==='virement'||tx.type==='convert'){
+      var c=LABELS[tx.type]||'Autre';
+      cats[c]=(cats[c]||0)+Math.abs(tx.amt||0);
     }
   });
 
@@ -657,42 +679,8 @@ function ecInitSpendingChart(){
 function ecFilterTx(type, btn){
   document.querySelectorAll('.ec-tx-ftab').forEach(function(t){t.classList.remove('active');});
   if(btn) btn.classList.add('active');
-
-  var txRaw=localStorage.getItem('ec_tx');
-  var txList=[];
-  try{txList=JSON.parse(txRaw)||[];}catch(e){}
-
-  var now=new Date();
-  var filtered=txList.filter(function(tx){
-    if(type==='tous') return true;
-    if(type==='depot') return tx.montant>0;
-    if(type==='virement') return tx.type==='virement'||tx.type==='prelevement';
-    if(type==='mois'){
-      var d=new Date(tx.date||tx.createdAt);
-      return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-    }
-    return true;
-  });
-
-  // Re-render avec la liste filtrée
-  var list=document.getElementById('ec-tx-list');
-  if(!list) return;
-  if(!filtered.length){
-    list.innerHTML='<div class="ec-tx-empty">Aucune transaction dans cette catégorie.</div>';
-    return;
-  }
-  list.innerHTML='';
-  filtered.slice().reverse().forEach(function(tx){
-    var pos=tx.montant>0;
-    var d=new Date(tx.date||tx.createdAt);
-    var dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-    var item=document.createElement('div');
-    item.className='ec-tx-item';
-    item.innerHTML='<div class="ec-tx-ico '+(pos?'dep':'ret')+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="'+(pos?'19 12 12 5 5 12':'5 12 12 19 19 12')+'"/></svg></div>'
-      +'<div class="ec-tx-info"><div class="ec-tx-label">'+(tx.label||tx.type||'Opération')+'</div><div class="ec-tx-date">'+dateStr+'</div></div>'
-      +'<div class="ec-tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'')+tx.montant.toLocaleString('fr-FR')+'€</div>';
-    list.appendChild(item);
-  });
+  EC_TX_FILTER = type || 'tous';
+  ecRenderTx();
 }
 
 // ── RIB / IBAN ──
@@ -707,8 +695,8 @@ function ecInitRib(){
   var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
   set('ec-rib-titulaire',(user.prenom||'')+' '+(user.nom||''));
   set('ec-rib-iban',iban);
-  set('ec-rib-bic','SOFIFR2PXXX');
-  set('ec-rib-banque','Sofinco');
+  set('ec-rib-bic','SWEKFRPPXXX');
+  set('ec-rib-banque','Swek');
 }
 function ecCopyIban(){
   var user=ecGetUser();
@@ -723,9 +711,9 @@ function ecDownloadRib(){
   var user=ecGetUser();
   if(!user) return;
   var iban=ecGenerateIban(user.id||'');
-  var content='RIB — Solfianza\n\nTitulaire : '+(user.prenom||'')+' '+(user.nom||'')+'\nIBAN      : '+iban+'\nBIC       : SOFIFR2PXXX\nBanque    : Sofinco\n\nDocument généré le '+new Date().toLocaleDateString('fr-FR');
+  var content='RIB — Swek\n\nTitulaire : '+(user.prenom||'')+' '+(user.nom||'')+'\nIBAN      : '+iban+'\nBIC       : SWEKFRPPXXX\nBanque    : Swek\n\nDocument généré le '+new Date().toLocaleDateString('fr-FR');
   var blob=new Blob([content],{type:'text/plain'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='RIB_Solfianza.txt';a.click();
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='RIB_Swek.txt';a.click();
 }
 
 // ── Remboursement anticipé ──
@@ -768,7 +756,7 @@ function ecInitNotifs(){
   var diff=Math.ceil((next-new Date())/(24*3600*1000));
   if(mens>0&&diff<=7) notifs.push({type:'warn',txt:'<strong>Échéance proche</strong> — Prélèvement de '+mens.toLocaleString('fr-FR')+'€ dans '+diff+' jour'+(diff>1?'s':'')+'.'});
   if(mens>0&&solde<mens*2) notifs.push({type:'warn',txt:'<strong>Solde faible</strong> — Votre solde est inférieur à 2 mensualités.'});
-  notifs.push({type:'info',txt:'<strong>Bienvenue</strong> — Votre espace client Solfianza est actif.'});
+  notifs.push({type:'info',txt:'<strong>Bienvenue</strong> — Votre espace client Swek est actif.'});
 
   if(!notifs.length){
     list.innerHTML='<div class="ec-notif-empty">Aucune notification.</div>';return;
@@ -806,7 +794,7 @@ function ecRenderMessages(){
     var dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     var item=document.createElement('div');
     item.className='ec-msg-item'+(m.fromClient?' ec-msg-item--client':' ec-msg-item--bank');
-    item.innerHTML='<div class="ec-msg-bubble"><div class="ec-msg-meta"><span class="ec-msg-sender">'+(m.fromClient?'Vous':'Sofinco')+'</span><span class="ec-msg-time">'+dateStr+'</span></div><div class="ec-msg-body">'+m.text+'</div></div>';
+    item.innerHTML='<div class="ec-msg-bubble"><div class="ec-msg-meta"><span class="ec-msg-sender">'+(m.fromClient?'Vous':'Swek')+'</span><span class="ec-msg-time">'+dateStr+'</span></div><div class="ec-msg-body">'+m.text+'</div></div>';
     list.appendChild(item);
   });
 }
@@ -822,7 +810,7 @@ function ecSendMessage(){
   ecRenderMessages();
   setTimeout(function(){
     var m2=ecGetMessages();
-    m2.push({text:'Merci pour votre message. Un conseiller Sofinco vous répondra dans les 24h ouvrées.',date:new Date().toISOString(),fromClient:false});
+    m2.push({text:'Merci pour votre message. Un conseiller Swek vous répondra dans les 24h ouvrées.',date:new Date().toISOString(),fromClient:false});
     ecSaveMessages(m2);
     ecRenderMessages();
   },1200);
@@ -831,7 +819,7 @@ function ecSendMessage(){
 // ── Auto-init selon la page ──
 (function(){
   var p=window.location.pathname;
-  if(p.indexOf('espace-client.html')!==-1) ecInitDashboard();
+  if(p.indexOf('espaceclient.html')!==-1) ecInitDashboard();
   else if(p.indexOf('mes-documents.html')!==-1) ecInitDocuments();
   else if(p.indexOf('suivi-dossier.html')!==-1) ecInitSuivi();
   else if(p.indexOf('messagerie.html')!==-1) ecInitMessagerie();
