@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Swek — Espace Client</title>
+  <script>
+  (function(){
+    // Redirige vers le tableau de bord si une session est ouverte, sinon vers la connexion.
+    var logged = localStorage.getItem('ec_session') === '1';
+    location.replace(logged ? 'espaceclient.html' : 'connexion.html');
+  })();
+  </script>
+</head>
+<body>
+  <noscript><p style="font-family:sans-serif;text-align:center;margin-top:3rem">
+    Veuillez activer JavaScript, puis ouvrez <a href="connexion.html">la page de connexion</a>.
+  </p></noscript>
+</body>
+</html>
