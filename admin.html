@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Solfianza</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#0d2748;min-height:100vh}
+
+    /* ── Login ── */
+    #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d2748 0%,#1a3a5c 100%)}
+    .login-card{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.3);text-align:center}
+    .login-logo{font-size:1.8rem;font-weight:800;color:#0d2748;margin-bottom:.2rem}
+    .login-sub{font-size:.75rem;font-weight:700;color:#06c2b0;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem}
+    .login-inp{width:100%;border:1.5px solid #e2e6ed;border-radius:10px;padding:.82rem 1rem;font-size:1rem;outline:none;font-family:inherit;transition:border-color .2s;margin-bottom:.8rem}
+    .login-inp:focus{border-color:#06c2b0}
+    .login-btn{width:100%;padding:.88rem;border-radius:2rem;background:#ff6b5c;color:#fff;border:none;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
+    .login-btn:hover{background:#e85545}
+    .login-err{background:#fff5f5;border:1.5px solid #f5c6cb;border-radius:8px;padding:.6rem .9rem;font-size:.84rem;color:#c0392b;margin-bottom:.8rem;display:none}
+
+    /* ── Layout ── */
+    #admin-screen{display:none}
+    .adm-header{background:#0d2748;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+    .adm-logo{font-size:1.2rem;font-weight:800;color:#fff}
+    .adm-badge{background:rgba(255,107,92,.2);color:#ff6b5c;border:1px solid rgba(255,107,92,.3);border-radius:2rem;padding:.3rem .8rem;font-size:.72rem;font-weight:800;letter-spacing:.05em}
+    .adm-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:2rem;padding:.35rem .8rem;font-size:.76rem;font-weight:600;color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;transition:all .2s}
+    .adm-logout:hover{background:rgba(255,255,255,.2);color:#fff}
+
+    /* ── Nav tabs ── */
+    .adm-nav{background:#fff;border-bottom:1px solid #e2e6ed;display:flex;padding:0 1.5rem;gap:0;overflow-x:auto}
+    .adm-tab{padding:.85rem 1.2rem;font-size:.85rem;font-weight:700;color:#8a94a6;border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+    .adm-tab.active{color:#0d2748;border-bottom-color:#ff6b5c}
+    .adm-tab:hover:not(.active){color:#0d2748}
+
+    .adm-main{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+    .adm-section{display:none}
+    .adm-section.active{display:block}
+
+    /* ── Stats ── */
+    .adm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .adm-stat{background:#fff;border-radius:14px;padding:1.3rem 1.2rem;border:1px solid #e2e6ed;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+    .adm-stat-lbl{font-size:.7rem;font-weight:700;color:#8a94a6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+    .adm-stat-val{font-size:1.7rem;font-weight:800;color:#0d2748}
+    .adm-stat-val--green{color:#27ae60}
+    .adm-stat-val--coral{color:#ff6b5c}
+    .adm-stat-val--teal{color:#06c2b0}
+
+    /* ── Toolbar ── */
+    .adm-toolbar{display:flex;gap:.8rem;margin-bottom:1.2rem;flex-wrap:wrap;align-items:center}
+    .adm-search{flex:1;min-width:220px;border:1.5px solid #e2e6ed;border-radius:10px;padding:.7rem 1rem;font-size:.9rem;outline:none;font-family:inherit;transition:border-color .2s}
+    .adm-search:focus{border-color:#06c2b0}
+    .adm-btn{padding:.7rem 1.2rem;border-radius:10px;background:#0d2748;color:#fff;border:none;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap}
+    .adm-btn:hover{background:#1a3a5c}
+    .adm-btn--coral{background:#ff6b5c}
+    .adm-btn--coral:hover{background:#e85545}
+    .adm-btn--green{background:#27ae60}
+    .adm-btn--green:hover{background:#1e9650}
+
+    /* ── Table ── */
+    .adm-table-wrap{background:#fff;border-radius:16px;border:1px solid #e2e6ed;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow-x:auto}
+    table{width:100%;border-collapse:collapse;min-width:800px}
+    thead{background:#f8f9fb}
+    th{padding:.85rem 1rem;text-align:left;font-size:.7rem;font-weight:800;color:#8a94a6;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #e2e6ed;white-space:nowrap}
+    td{padding:.85rem 1rem;font-size:.86rem;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fafbfc}
+    .td-name{font-weight:700;color:#0d2748}
+    .td-sub{color:#8a94a6;font-size:.78rem;margin-top:2px}
+    .td-tag{font-family:monospace;font-size:.78rem;background:#f0f2f5;padding:.18rem .45rem;border-radius:4px;color:#0d2748;font-weight:700}
+    .td-tag--blue{background:#e8f0fe;color:#1a56db}
+    .td-solde{font-weight:800;color:#06c2b0}
+    .td-solde--neg{color:#e74c3c}
+    .td-actions{display:flex;gap:.3rem;flex-wrap:wrap}
+    .btn-sm{padding:.28rem .6rem;border-radius:6px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+    .btn-view{background:#e8faf8;color:#049f90}
+    .btn-view:hover{background:#06c2b0;color:#fff}
+    .btn-deposit{background:#e8f8ee;color:#1e9650}
+    .btn-deposit:hover{background:#27ae60;color:#fff}
+    .btn-action{background:#eef2ff;color:#4f46e5}
+    .btn-action:hover{background:#4f46e5;color:#fff}
+    .btn-del{background:#fff5f5;color:#e74c3c}
+    .btn-del:hover{background:#e74c3c;color:#fff}
+    .adm-empty{text-align:center;padding:3rem 1rem;color:#8a94a6;font-size:.95rem}
+
+    /* ── Status badge ── */
+    .status-badge{display:inline-block;padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+    .status-active{background:#ecfdf5;color:#059669}
+    .status-pending{background:#fefce8;color:#ca8a04}
+    .status-blocked{background:#fef2f2;color:#dc2626}
+
+    /* ── Modal ── */
+    .adm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .2s}
+    .adm-overlay.open{opacity:1;pointer-events:all}
+    .adm-modal{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:scale(.95);transition:transform .2s}
+    .adm-overlay.open .adm-modal{transform:scale(1)}
+    .adm-modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+    .adm-modal-title{font-size:1.1rem;font-weight:800;color:#0d2748}
+    .adm-modal-close{background:#f0f2f5;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;color:#555}
+    .adm-modal-close:hover{background:#e2e6ed}
+
+    .adm-field{margin-bottom:1rem}
+    .adm-field-lbl{font-size:.7rem;font-weight:700;color:#8a94a6;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem}
+    .adm-field-val{font-size:.95rem;font-weight:600;color:#0d2748}
+    .adm-field-inp{width:100%;border:1.5px solid #e2e6ed;border-radius:10px;padding:.72rem .9rem;font-size:.93rem;outline:none;font-family:inherit;transition:border-color .2s}
+    .adm-field-inp:focus{border-color:#06c2b0}
+    .adm-field-select{width:100%;border:1.5px solid #e2e6ed;border-radius:10px;padding:.72rem .9rem;font-size:.93rem;outline:none;font-family:inherit;background:#fff;appearance:none;cursor:pointer}
+    .adm-field-select:focus{border-color:#06c2b0}
+    .adm-divider{border:none;border-top:1px solid #e2e6ed;margin:1.2rem 0}
+    .adm-modal-note{font-size:.8rem;color:#8a94a6;margin-bottom:1rem;line-height:1.5}
+    .adm-modal-success{background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:10px;padding:.8rem 1rem;font-size:.88rem;color:#065f46;font-weight:600;margin-bottom:1rem;display:none}
+    .adm-modal-err{background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:.8rem 1rem;font-size:.88rem;color:#991b1b;font-weight:600;margin-bottom:1rem;display:none}
+
+    /* ── Action rapide par ID ── */
+    .quick-action-card{background:#fff;border-radius:16px;border:1px solid #e2e6ed;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:1.5rem}
+    .quick-action-title{font-size:.85rem;font-weight:800;color:#0d2748;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .quick-action-row{display:flex;gap:.6rem;flex-wrap:wrap}
+
+    /* ── Journal ── */
+    .log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid #f0f2f5;font-size:.84rem}
+    .log-item:last-child{border-bottom:none}
+    .log-type{display:inline-block;padding:.18rem .5rem;border-radius:4px;font-size:.7rem;font-weight:800;margin-right:.4rem}
+    .log-depot{background:#ecfdf5;color:#065f46}
+    .log-retrait{background:#fef2f2;color:#991b1b}
+    .log-modif{background:#eff6ff;color:#1e40af}
+    .log-suppr{background:#fef3c7;color:#92400e}
+
+    @media(max-width:640px){
+      .adm-main{padding:1rem}
+      th,td{padding:.6rem .5rem;font-size:.75rem}
+      .adm-stat-val{font-size:1.3rem}
+      .adm-tab{padding:.7rem .8rem;font-size:.78rem}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Solfianza</div>
+    <div class="login-sub">Panel Administrateur</div>
+    <div style="font-size:1.1rem;font-weight:800;color:#0d2748;margin-bottom:1.5rem">Connexion sécurisée</div>
+    <div class="login-err" id="login-err">Mot de passe incorrect.</div>
+    <input type="password" class="login-inp" id="adm-pwd" placeholder="Mot de passe admin" onkeydown="if(event.key==='Enter')admLogin()"/>
+    <button class="login-btn" onclick="admLogin()">Accéder au panel</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen">
+  <header class="adm-header">
+    <div style="display:flex;align-items:center;gap:.8rem">
+      <div class="adm-logo">Solfianza</div>
+      <div class="adm-badge">ADMIN</div>
+    </div>
+    <button class="adm-logout" onclick="admLogout()">Déconnexion</button>
+  </header>
+
+  <nav class="adm-nav">
+    <button class="adm-tab active" onclick="admTab('clients',this)">👥 Clients</button>
+    <button class="adm-tab" onclick="admTab('operations',this)">💳 Opérations</button>
+    <button class="adm-tab" onclick="admTab('journal',this)">📋 Journal</button>
+  </nav>
+
+  <div class="adm-main">
+
+    <!-- ── CLIENTS ── -->
+    <div class="adm-section active" id="sec-clients">
+
+      <div class="adm-stats" id="adm-stats"></div>
+
+      <!-- Action rapide par ID -->
+      <div class="quick-action-card">
+        <div class="quick-action-title">⚡ Action rapide par identifiant client</div>
+        <div class="quick-action-row">
+          <input class="adm-search" id="quick-id" placeholder="Identifiant client USR-XXXX..." style="flex:2;min-width:200px"/>
+          <button class="adm-btn adm-btn--green" onclick="quickDeposit()">+ Dépôt</button>
+          <button class="adm-btn adm-btn--coral" onclick="quickRetrait()">− Retrait</button>
+          <button class="adm-btn" onclick="quickPret()">✎ Modifier prêt</button>
+        </div>
+        <div class="adm-modal-err" id="quick-err" style="margin-top:.8rem;margin-bottom:0"></div>
+      </div>
+
+      <div class="adm-toolbar">
+        <input class="adm-search" id="adm-search" type="text" placeholder="Rechercher nom, email, ID, dossier..." oninput="admFilter()"/>
+        <button class="adm-btn" onclick="admExportCSV()">⬇ CSV</button>
+        <button class="adm-btn adm-btn--coral" onclick="admRefresh()">↺ Actualiser</button>
+      </div>
+
+      <div class="adm-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Identifiant</th>
+              <th>N° dossier</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Solde</th>
+              <th>Statut</th>
+              <th>Inscription</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adm-tbody"></tbody>
+        </table>
+        <div class="adm-empty" id="adm-empty" style="display:none">Aucun client trouvé.</div>
+      </div>
+    </div>
+
+    <!-- ── OPÉRATIONS ── -->
+    <div class="adm-section" id="sec-operations">
+      <div class="adm-stats" style="margin-bottom:2rem">
+        <div class="adm-stat">
+          <div class="adm-stat-lbl">Dépôts effectués</div>
+          <div class="adm-stat-val adm-stat-val--green" id="op-depots">0</div>
+        </div>
+        <div class="adm-stat">
+          <div class="adm-stat-lbl">Retraits effectués</div>
+          <div class="adm-stat-val adm-stat-val--coral" id="op-retraits">0</div>
+        </div>
+        <div class="adm-stat">
+          <div class="adm-stat-lbl">Total injecté</div>
+          <div class="adm-stat-val adm-stat-val--teal" id="op-total">0,00 €</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem">
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">💚 Dépôt sur compte client</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="dep-id" placeholder="USR-XXXX..."/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Montant (€)</div>
+            <input class="adm-field-inp" id="dep-amt" type="number" min="1" placeholder="Ex : 1500"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Libellé</div>
+            <input class="adm-field-inp" id="dep-label" placeholder="Ex : Virement Solfianza"/></div>
+          <div class="adm-modal-success" id="dep-ok">✓ Dépôt effectué avec succès.</div>
+          <div class="adm-modal-err" id="dep-err"></div>
+          <button class="adm-btn adm-btn--green" style="width:100%;border-radius:10px" onclick="opDeposit()">Effectuer le dépôt</button>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">🔴 Retrait sur compte client</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="ret-id" placeholder="USR-XXXX..."/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Montant (€)</div>
+            <input class="adm-field-inp" id="ret-amt" type="number" min="1" placeholder="Ex : 500"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Libellé</div>
+            <input class="adm-field-inp" id="ret-label" placeholder="Ex : Frais de dossier"/></div>
+          <div class="adm-modal-success" id="ret-ok">✓ Retrait effectué avec succès.</div>
+          <div class="adm-modal-err" id="ret-err"></div>
+          <button class="adm-btn adm-btn--coral" style="width:100%;border-radius:10px" onclick="opRetrait()">Effectuer le retrait</button>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">✎ Modifier les données de prêt</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="pret-id" placeholder="USR-XXXX..."/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Montant du crédit (€)</div>
+            <input class="adm-field-inp" id="pret-montant" type="number" placeholder="Ex : 10000"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Mensualité (€)</div>
+            <input class="adm-field-inp" id="pret-mens" type="number" placeholder="Ex : 200"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Durée (mois)</div>
+            <input class="adm-field-inp" id="pret-duree" type="number" placeholder="Ex : 60"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Taux annuel (%)</div>
+            <input class="adm-field-inp" id="pret-taux" type="number" step="0.01" placeholder="Ex : 3.5"/></div>
+          <div class="adm-modal-success" id="pret-ok">✓ Données de prêt mises à jour.</div>
+          <div class="adm-modal-err" id="pret-err"></div>
+          <button class="adm-btn" style="width:100%;border-radius:10px" onclick="opModPret()">Enregistrer le prêt</button>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">🔒 Bloquer / Débloquer compte</div>
+          <div class="adm-modal-note">Bloquer un compte empêche le client de se connecter à son espace. Il peut toujours récupérer l'accès sur demande.</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="blk-id" placeholder="USR-XXXX..."/></div>
+          <div class="adm-modal-success" id="blk-ok">✓ Statut mis à jour.</div>
+          <div class="adm-modal-err" id="blk-err"></div>
+          <div style="display:flex;gap:.6rem;margin-top:.4rem">
+            <button class="adm-btn adm-btn--coral" style="flex:1;border-radius:10px" onclick="opBlock(true)">Bloquer</button>
+            <button class="adm-btn adm-btn--green" style="flex:1;border-radius:10px" onclick="opBlock(false)">Débloquer</button>
+          </div>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">📝 Modifier les informations client</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="edit-id" placeholder="USR-XXXX..." onchange="admPrefill()"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Prénom</div>
+            <input class="adm-field-inp" id="edit-prenom" placeholder="Prénom"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Nom</div>
+            <input class="adm-field-inp" id="edit-nom" placeholder="Nom"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Email</div>
+            <input class="adm-field-inp" id="edit-email" type="email" placeholder="email@exemple.fr"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">Téléphone</div>
+            <input class="adm-field-inp" id="edit-tel" placeholder="06 XX XX XX XX"/></div>
+          <div class="adm-field"><div class="adm-field-lbl">N° dossier</div>
+            <input class="adm-field-inp" id="edit-ref" placeholder="SOF-2026-XXXXX"/></div>
+          <div class="adm-modal-success" id="edit-ok">✓ Informations mises à jour.</div>
+          <div class="adm-modal-err" id="edit-err"></div>
+          <button class="adm-btn" style="width:100%;border-radius:10px" onclick="opEditUser()">Enregistrer</button>
+        </div>
+
+        <div class="quick-action-card">
+          <div class="quick-action-title">🗑️ Supprimer un compte</div>
+          <div class="adm-modal-note">⚠️ Action irréversible. Toutes les données du client seront effacées définitivement.</div>
+          <div class="adm-field"><div class="adm-field-lbl">Identifiant client</div>
+            <input class="adm-field-inp" id="del-id" placeholder="USR-XXXX..."/></div>
+          <div class="adm-modal-err" id="del-err"></div>
+          <button class="adm-btn btn-del" style="width:100%;border-radius:10px;padding:.72rem;font-size:.88rem;background:#e74c3c;color:#fff;border:none" onclick="opDelete()">Supprimer définitivement</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── JOURNAL ── -->
+    <div class="adm-section" id="sec-journal">
+      <div class="adm-toolbar" style="margin-bottom:1.2rem">
+        <span style="font-weight:700;font-size:.95rem">Journal des actions admin</span>
+        <button class="adm-btn adm-btn--coral" style="margin-left:auto" onclick="admClearLog()">Effacer le journal</button>
+      </div>
+      <div class="adm-table-wrap" style="padding:1rem 1.5rem">
+        <div id="adm-log-list"><div class="adm-empty">Aucune action enregistrée.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Détail client modal -->
+<div class="adm-overlay" id="adm-detail-overlay" onclick="admCloseDetail(event)">
+  <div class="adm-modal" onclick="event.stopPropagation()">
+    <div class="adm-modal-hd">
+      <div class="adm-modal-title" id="detail-name">Détail client</div>
+      <button class="adm-modal-close" onclick="admCloseDetail()">✕</button>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+var ADMIN_PWD = 'Solfianza2026!';
+var SESSION_KEY = 'adm_auth';
+var LOG_KEY = 'adm_log';
+
+/* ── AUTH ── */
+function admLogin(){
+  var pwd = document.getElementById('adm-pwd').value;
+  if(pwd === ADMIN_PWD){
+    sessionStorage.setItem(SESSION_KEY,'1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    admLoad();
+  } else {
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('adm-pwd').value='';
+  }
+}
+function admLogout(){ sessionStorage.removeItem(SESSION_KEY); location.reload(); }
+(function(){
+  if(sessionStorage.getItem(SESSION_KEY)==='1'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    admLoad();
+  }
+})();
+
+/* ── TABS ── */
+function admTab(sec, btn){
+  document.querySelectorAll('.adm-section').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('sec-'+sec).classList.add('active');
+  btn.classList.add('active');
+  if(sec==='journal') admRenderLog();
+}
+
+/* ── DATA ── */
+function admGetClients(){
+  var clients=[];
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i); if(!k) continue;
+    if(k==='ec_user'){
+      try{
+        var u=JSON.parse(localStorage.getItem(k));
+        if(u&&u.email) clients.push({key:k,user:u,solde:parseFloat(localStorage.getItem('ec_solde')||'0'),tx:tryParse(localStorage.getItem('ec_tx'))});
+      }catch(e){}
+    } else if(k.startsWith('ec_user_')){
+      var uid=k.replace('ec_user_','');
+      try{
+        var u2=JSON.parse(localStorage.getItem(k));
+        if(u2&&u2.email) clients.push({key:k,user:u2,solde:parseFloat(localStorage.getItem('ec_solde_'+uid)||'0'),tx:tryParse(localStorage.getItem('ec_tx_'+uid))});
+      }catch(e){}
+    }
+  }
+  return clients;
+}
+
+function findClientByUID(uid){
+  uid = uid.trim().toUpperCase();
+  var clients = admGetClients();
+  return clients.find(function(c){ return (c.user.id||'').toUpperCase() === uid; }) || null;
+}
+
+function saveUser(c){
+  localStorage.setItem(c.key, JSON.stringify(c.user));
+}
+function saveSolde(c, solde){
+  var uid = c.key.replace('ec_user_','');
+  if(c.key==='ec_user') localStorage.setItem('ec_solde', solde.toFixed(2));
+  else localStorage.setItem('ec_solde_'+uid, solde.toFixed(2));
+}
+function saveTx(c, tx){
+  var uid = c.key.replace('ec_user_','');
+  if(c.key==='ec_user') localStorage.setItem('ec_tx', JSON.stringify(tx));
+  else localStorage.setItem('ec_tx_'+uid, JSON.stringify(tx));
+}
+
+function tryParse(s){ try{return JSON.parse(s||'[]');}catch(e){return[];} }
+function fmtAmt(v){ return (v||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+function fmtDate(iso){ if(!iso) return '—'; var d=new Date(iso); return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDateShort(iso){ if(!iso) return '—'; return new Date(iso).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+
+var ALL_CLIENTS=[];
+
+function admLoad(){
+  ALL_CLIENTS=admGetClients();
+  admRenderStats();
+  admRenderTable(ALL_CLIENTS);
+  admRenderOpStats();
+}
+function admRefresh(){ admLoad(); }
+
+function admRenderStats(){
+  var total=ALL_CLIENTS.length;
+  var soldeTotal=ALL_CLIENTS.reduce(function(s,c){return s+(c.solde||0);},0);
+  var encours=ALL_CLIENTS.reduce(function(s,c){return s+((c.user.loan&&c.user.loan.montant)||0);},0);
+  var actifs=ALL_CLIENTS.filter(function(c){return !c.user.blocked;}).length;
+  var today=new Date().toDateString();
+  var todayCount=ALL_CLIENTS.filter(function(c){return c.user.createdAt&&new Date(c.user.createdAt).toDateString()===today;}).length;
+  document.getElementById('adm-stats').innerHTML=
+    statCard('Clients total',total,'')
+   +statCard('Actifs',actifs,'adm-stat-val--green')
+   +statCard('Solde total',fmtAmt(soldeTotal),'adm-stat-val--teal')
+   +statCard('Encours crédit',fmtAmt(encours),'')
+   +statCard('Inscrits aujourd\'hui',todayCount,'adm-stat-val--coral');
+}
+function statCard(lbl,val,cls){
+  return '<div class="adm-stat"><div class="adm-stat-lbl">'+lbl+'</div><div class="adm-stat-val '+cls+'">'+val+'</div></div>';
+}
+
+function admRenderOpStats(){
+  var log=tryParse(localStorage.getItem(LOG_KEY));
+  var depots=log.filter(function(l){return l.type==='depot';}).length;
+  var retraits=log.filter(function(l){return l.type==='retrait';}).length;
+  var totalInj=log.filter(function(l){return l.type==='depot';}).reduce(function(s,l){return s+(l.amt||0);},0);
+  var el=document.getElementById('op-depots'); if(el) el.textContent=depots;
+  el=document.getElementById('op-retraits'); if(el) el.textContent=retraits;
+  el=document.getElementById('op-total'); if(el) el.textContent=fmtAmt(totalInj);
+}
+
+function admRenderTable(clients){
+  var tbody=document.getElementById('adm-tbody');
+  var empty=document.getElementById('adm-empty');
+  if(!clients.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=clients.map(function(c,i){
+    var u=c.user;
+    var status=u.blocked
+      ?'<span class="status-badge status-blocked">Bloqué</span>'
+      :(u.loan&&u.loan.montant>0
+        ?'<span class="status-badge status-active">Actif</span>'
+        :'<span class="status-badge status-pending">En attente</span>');
+    return '<tr>'
+      +'<td><div class="td-name">'+(u.prenom||'')+' '+(u.nom||'')+'</div><div class="td-sub">'+(u.tel||'')+'</div></td>'
+      +'<td><span class="td-tag td-tag--blue">'+(u.id||'—')+'</span></td>'
+      +'<td>'+(u.ref?'<span class="td-tag">'+u.ref+'</span>':'<span style="color:#ccc">—</span>')+'</td>'
+      +'<td style="color:#555;font-size:.82rem">'+(u.email||'—')+'</td>'
+      +'<td style="color:#555;font-size:.82rem">'+(u.tel||'—')+'</td>'
+      +'<td class="td-solde'+(c.solde<0?' td-solde--neg':'')+'">'+fmtAmt(c.solde)+'</td>'
+      +'<td>'+status+'</td>'
+      +'<td style="color:#8a94a6;font-size:.78rem">'+fmtDateShort(u.createdAt)+'</td>'
+      +'<td><div class="td-actions">'
+      +'<button class="btn-sm btn-view" onclick="admDetail('+i+')">Voir</button>'
+      +'<button class="btn-sm btn-deposit" onclick="quickDepositFor(\''+((u.id)||'')+'\')">Dépôt</button>'
+      +'<button class="btn-sm btn-action" onclick="quickPretFor(\''+((u.id)||'')+'\')">Prêt</button>'
+      +'<button class="btn-sm btn-del" onclick="admConfirmDelete(\''+c.key+'\',\''+((u.prenom||'')+' '+(u.nom||'')).trim()+'\')">✕</button>'
+      +'</div></td>'
+      +'</tr>';
+  }).join('');
+}
+
+function admFilter(){
+  var q=document.getElementById('adm-search').value.toLowerCase().trim();
+  if(!q){admRenderTable(ALL_CLIENTS);return;}
+  admRenderTable(ALL_CLIENTS.filter(function(c){
+    var u=c.user;
+    return ((u.prenom||'')+' '+(u.nom||'')+' '+(u.email||'')+' '+(u.ref||'')+' '+(u.tel||'')+' '+(u.id||'')).toLowerCase().indexOf(q)!==-1;
+  }));
+}
+
+/* ── DETAIL ── */
+function admDetail(idx){
+  var c=ALL_CLIENTS[idx]; if(!c) return;
+  var u=c.user; var tx=c.tx||[];
+  var loan=u.loan||{};
+  document.getElementById('detail-name').textContent=(u.prenom||'')+' '+(u.nom||'');
+  var html='';
+  [['Identifiant',u.id||'—'],['Prénom',u.prenom],['Nom',u.nom],['Email',u.email],
+   ['Téléphone',u.tel],['N° dossier',u.ref||'—'],['Solde',fmtAmt(c.solde)],
+   ['Statut',u.blocked?'🔴 Bloqué':'🟢 Actif'],['Inscription',fmtDate(u.createdAt)]
+  ].forEach(function(f){
+    html+='<div class="adm-field"><div class="adm-field-lbl">'+f[0]+'</div><div class="adm-field-val">'+(f[1]||'—')+'</div></div>';
+  });
+  if(loan.montant){
+    html+='<hr class="adm-divider"/><div class="adm-field-lbl" style="margin-bottom:.8rem">Données du prêt</div>';
+    [['Montant',fmtAmt(loan.montant)],['Mensualité',fmtAmt(loan.mensualite)],['Durée',loan.duree+' mois'],['Taux',(loan.taux||3.5)+' %']].forEach(function(f){
+      html+='<div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f0f2f5;font-size:.86rem"><span style="color:#8a94a6">'+f[0]+'</span><strong>'+f[1]+'</strong></div>';
+    });
+  }
+  if(tx.length){
+    html+='<hr class="adm-divider"/><div class="adm-field-lbl" style="margin-bottom:.6rem">Dernières opérations</div>';
+    html+=tx.slice(0,6).map(function(t){
+      var isOut=t.type==='virement';
+      return '<div style="display:flex;justify-content:space-between;padding:.45rem 0;border-bottom:1px solid #f0f2f5;font-size:.82rem">'
+        +'<span>'+t.label+' <span style="color:#8a94a6;font-size:.75rem">'+t.date+'</span></span>'
+        +'<span style="font-weight:800;color:'+(isOut?'#e74c3c':'#27ae60')+'">'+(isOut?'-':'+')+fmtAmt(t.amt)+'</span>'
+        +'</div>';
+    }).join('');
+  }
+  document.getElementById('detail-body').innerHTML=html;
+  document.getElementById('adm-detail-overlay').classList.add('open');
+}
+function admCloseDetail(e){
+  if(e&&e.target!==document.getElementById('adm-detail-overlay')) return;
+  document.getElementById('adm-detail-overlay').classList.remove('open');
+}
+
+/* ── OPÉRATIONS ── */
+function showMsg(okId,errId,msg,isOk){
+  var ok=document.getElementById(okId); var err=document.getElementById(errId);
+  if(isOk){ok.style.display='block';err.style.display='none';ok.textContent='✓ '+msg;}
+  else{err.style.display='block';ok.style.display='none';err.textContent='✗ '+msg;}
+  setTimeout(function(){ok.style.display='none';err.style.display='none';},4000);
+}
+
+function opDeposit(){
+  var uid=document.getElementById('dep-id').value.trim();
+  var amt=parseFloat(document.getElementById('dep-amt').value);
+  var label=(document.getElementById('dep-label').value.trim()||'Dépôt Solfianza');
+  if(!uid) return showMsg('dep-ok','dep-err','Identifiant requis.',false);
+  if(!amt||amt<=0) return showMsg('dep-ok','dep-err','Montant invalide.',false);
+  var c=findClientByUID(uid);
+  if(!c) return showMsg('dep-ok','dep-err','Client introuvable.',false);
+  var newSolde=(c.solde||0)+amt;
+  saveSolde(c, newSolde);
+  var tx=tryParse(localStorage.getItem(c.key==='ec_user'?'ec_tx':'ec_tx_'+c.key.replace('ec_user_','')));
+  tx.unshift({label:label,amt:amt,type:'credit',date:new Date().toLocaleDateString('fr-FR')});
+  saveTx(c,tx);
+  admLog('depot', uid, label, amt);
+  admLoad();
+  showMsg('dep-ok','dep-err','Dépôt de '+fmtAmt(amt)+' effectué sur '+((c.user.prenom||'')+' '+(c.user.nom||'')).trim()+'.',true);
+  document.getElementById('dep-id').value='';
+  document.getElementById('dep-amt').value='';
+  document.getElementById('dep-label').value='';
+}
+
+function opRetrait(){
+  var uid=document.getElementById('ret-id').value.trim();
+  var amt=parseFloat(document.getElementById('ret-amt').value);
+  var label=(document.getElementById('ret-label').value.trim()||'Retrait admin');
+  if(!uid) return showMsg('ret-ok','ret-err','Identifiant requis.',false);
+  if(!amt||amt<=0) return showMsg('ret-ok','ret-err','Montant invalide.',false);
+  var c=findClientByUID(uid);
+  if(!c) return showMsg('ret-ok','ret-err','Client introuvable.',false);
+  var newSolde=(c.solde||0)-amt;
+  saveSolde(c, newSolde);
+  var tx=tryParse(localStorage.getItem(c.key==='ec_user'?'ec_tx':'ec_tx_'+c.key.replace('ec_user_','')));
+  tx.unshift({label:label,amt:amt,type:'virement',date:new Date().toLocaleDateString('fr-FR')});
+  saveTx(c,tx);
+  admLog('retrait', uid, label, amt);
+  admLoad();
+  showMsg('ret-ok','ret-err','Retrait de '+fmtAmt(amt)+' effectué sur '+((c.user.prenom||'')+' '+(c.user.nom||'')).trim()+'.',true);
+  document.getElementById('ret-id').value='';
+  document.getElementById('ret-amt').value='';
+  document.getElementById('ret-label').value='';
+}
+
+function opModPret(){
+  var uid=document.getElementById('pret-id').value.trim();
+  var montant=parseFloat(document.getElementById('pret-montant').value);
+  var mens=parseFloat(document.getElementById('pret-mens').value);
+  var duree=parseInt(document.getElementById('pret-duree').value);
+  var taux=parseFloat(document.getElementById('pret-taux').value)||3.5;
+  if(!uid) return showMsg('pret-ok','pret-err','Identifiant requis.',false);
+  if(!montant||montant<=0) return showMsg('pret-ok','pret-err','Montant invalide.',false);
+  var c=findClientByUID(uid);
+  if(!c) return showMsg('pret-ok','pret-err','Client introuvable.',false);
+  c.user.loan={montant:montant,mensualite:mens||0,duree:duree||60,taux:taux,dateDebut:new Date().toISOString()};
+  saveUser(c);
+  admLog('modif', uid, 'Modification prêt '+fmtAmt(montant), 0);
+  admLoad();
+  showMsg('pret-ok','pret-err','Prêt mis à jour pour '+((c.user.prenom||'')+' '+(c.user.nom||'')).trim()+'.',true);
+}
+
+function opBlock(block){
+  var uid=document.getElementById('blk-id').value.trim();
+  if(!uid) return showMsg('blk-ok','blk-err','Identifiant requis.',false);
+  var c=findClientByUID(uid);
+  if(!c) return showMsg('blk-ok','blk-err','Client introuvable.',false);
+  c.user.blocked=block;
+  saveUser(c);
+  admLog(block?'bloc':'debloc', uid, (block?'Blocage':'Déblocage')+' compte', 0);
+  admLoad();
+  showMsg('blk-ok','blk-err','Compte '+(block?'bloqué':'débloqué')+' — '+((c.user.prenom||'')+' '+(c.user.nom||'')).trim()+'.',true);
+}
+
+function admPrefill(){
+  var uid=document.getElementById('edit-id').value.trim();
+  var c=findClientByUID(uid); if(!c) return;
+  document.getElementById('edit-prenom').value=c.user.prenom||'';
+  document.getElementById('edit-nom').value=c.user.nom||'';
+  document.getElementById('edit-email').value=c.user.email||'';
+  document.getElementById('edit-tel').value=c.user.tel||'';
+  document.getElementById('edit-ref').value=c.user.ref||'';
+}
+
+function opEditUser(){
+  var uid=document.getElementById('edit-id').value.trim();
+  if(!uid) return showMsg('edit-ok','edit-err','Identifiant requis.',false);
+  var c=findClientByUID(uid);
+  if(!c) return showMsg('edit-ok','edit-err','Client introuvable.',false);
+  var p=document.getElementById('edit-prenom').value.trim();
+  var n=document.getElementById('edit-nom').value.trim();
+  var e=document.getElementById('edit-email').value.trim();
+  var t=document.getElementById('edit-tel').value.trim();
+  var r=document.getElementById('edit-ref').value.trim().toUpperCase();
+  if(p) c.user.prenom=p; if(n) c.user.nom=n;
+  if(e) c.user.email=e; if(t) c.user.tel=t;
+  if(r) c.user.ref=r;
+  saveUser(c);
+  admLog('modif', uid, 'Modification infos client', 0);
+  admLoad();
+  showMsg('edit-ok','edit-err','Informations mises à jour.',true);
+}
+
+function opDelete(){
+  var uid=document.getElementById('del-id').value.trim();
+  if(!uid) return showMsg('','del-err','Identifiant requis.',false);
+  var c=findClientByUID(uid);
+  if(!c){document.getElementById('del-err').style.display='block';document.getElementById('del-err').textContent='✗ Client introuvable.';return;}
+  var name=((c.user.prenom||'')+' '+(c.user.nom||'')).trim();
+  if(!confirm('Supprimer définitivement le compte de '+name+' ('+uid+') ?')) return;
+  var sk=c.key; var suid=sk.replace('ec_user_','');
+  localStorage.removeItem(sk);
+  if(sk==='ec_user'){localStorage.removeItem('ec_solde');localStorage.removeItem('ec_tx');localStorage.removeItem('ec_session');}
+  else{localStorage.removeItem('ec_solde_'+suid);localStorage.removeItem('ec_tx_'+suid);}
+  admLog('suppr', uid, 'Suppression compte '+name, 0);
+  admLoad();
+  document.getElementById('del-id').value='';
+  document.getElementById('del-err').style.display='none';
+  alert('Compte supprimé.');
+}
+
+/* ── Quick actions depuis tableau ── */
+function quickDepositFor(uid){
+  document.getElementById('dep-id').value=uid;
+  admTab('operations', document.querySelectorAll('.adm-tab')[1]);
+  setTimeout(function(){document.getElementById('dep-amt').focus();},200);
+}
+function quickPretFor(uid){
+  document.getElementById('pret-id').value=uid;
+  admTab('operations', document.querySelectorAll('.adm-tab')[1]);
+  setTimeout(function(){document.getElementById('pret-montant').focus();},200);
+}
+
+function getQuickUID(){
+  var uid=document.getElementById('quick-id').value.trim();
+  var err=document.getElementById('quick-err');
+  if(!uid){err.style.display='block';err.textContent='✗ Saisissez un identifiant client.';return null;}
+  var c=findClientByUID(uid);
+  if(!c){err.style.display='block';err.textContent='✗ Client introuvable pour cet identifiant.';return null;}
+  err.style.display='none'; return uid;
+}
+function quickDeposit(){ var uid=getQuickUID(); if(uid) quickDepositFor(uid); }
+function quickRetrait(){ var uid=getQuickUID(); if(uid){document.getElementById('ret-id').value=uid;admTab('operations',document.querySelectorAll('.adm-tab')[1]);setTimeout(function(){document.getElementById('ret-amt').focus();},200);} }
+function quickPret(){ var uid=getQuickUID(); if(uid) quickPretFor(uid); }
+
+function admConfirmDelete(key, name){
+  if(!confirm('Supprimer le compte de '+name+' ?')) return;
+  var uid=key.replace('ec_user_','');
+  localStorage.removeItem(key);
+  if(key==='ec_user'){localStorage.removeItem('ec_solde');localStorage.removeItem('ec_tx');localStorage.removeItem('ec_session');}
+  else{localStorage.removeItem('ec_solde_'+uid);localStorage.removeItem('ec_tx_'+uid);}
+  admLoad();
+}
+
+/* ── JOURNAL ── */
+function admLog(type, uid, label, amt){
+  var log=tryParse(localStorage.getItem(LOG_KEY));
+  log.unshift({type:type,uid:uid,label:label,amt:amt,at:new Date().toISOString()});
+  if(log.length>200) log=log.slice(0,200);
+  localStorage.setItem(LOG_KEY, JSON.stringify(log));
+}
+function admRenderLog(){
+  var log=tryParse(localStorage.getItem(LOG_KEY));
+  var el=document.getElementById('adm-log-list');
+  if(!log.length){el.innerHTML='<div class="adm-empty">Aucune action enregistrée.</div>';return;}
+  var typeLabel={depot:'Dépôt',retrait:'Retrait',modif:'Modification',suppr:'Suppression',bloc:'Blocage',debloc:'Déblocage'};
+  var typeCls={depot:'log-depot',retrait:'log-retrait',modif:'log-modif',suppr:'log-suppr',bloc:'log-retrait',debloc:'log-depot'};
+  el.innerHTML=log.map(function(l){
+    return '<div class="log-item">'
+      +'<div><span class="log-type '+(typeCls[l.type]||'log-modif')+'">'+(typeLabel[l.type]||l.type)+'</span>'
+      +'<strong style="font-size:.84rem">'+l.label+'</strong>'
+      +' <span style="color:#8a94a6;font-size:.78rem">— '+l.uid+'</span></div>'
+      +'<div style="text-align:right;font-size:.78rem;color:#8a94a6;white-space:nowrap">'+fmtDate(l.at)+(l.amt?'<br><strong style="color:#0d2748">'+fmtAmt(l.amt)+'</strong>':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+function admClearLog(){
+  if(!confirm('Effacer tout le journal ?')) return;
+  localStorage.removeItem(LOG_KEY);
+  admRenderLog();
+}
+
+/* ── CSV ── */
+function admExportCSV(){
+  if(!ALL_CLIENTS.length){alert('Aucun client à exporter.');return;}
+  var rows=[['ID','Prénom','Nom','Email','Téléphone','N° Dossier','Solde (€)','Montant crédit','Mensualité','Durée','Statut','Inscription']];
+  ALL_CLIENTS.forEach(function(c){
+    var u=c.user; var l=u.loan||{};
+    rows.push([u.id||'',u.prenom||'',u.nom||'',u.email||'',u.tel||'',u.ref||'',c.solde.toFixed(2),l.montant||0,l.mensualite||0,l.duree||0,u.blocked?'Bloqué':'Actif',u.createdAt||'']);
+  });
+  var csv=rows.map(function(r){return r.map(function(v){return '"'+(v+'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='clients_solfianza_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
