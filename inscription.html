@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Créer un compte — Swek</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="espaceclient.css"/>
+  <script>
+  (function(){
+    if(localStorage.getItem('ec_session') === '1') location.replace('espaceclient.html');
+  })();
+  </script>
+</head>
+<body class="ec-body">
+
+<div class="ec-auth-wrap">
+  <a href="index.html" class="ec-auth-logo">Swek</a>
+  <div class="ec-auth-sub">Espace Client</div>
+
+  <div class="ec-auth-card">
+    <h1 class="ec-auth-title">Créer mon compte</h1>
+    <p class="ec-auth-hint">Renseignez vos informations pour activer votre espace client.</p>
+
+    <div class="ec-form-err" id="ec-reg-err" style="display:none"></div>
+
+    <div class="ec-row2">
+      <div class="ec-form-group">
+        <label class="ec-lbl" for="ec-prenom">Prénom <span class="ec-req">*</span></label>
+        <input class="ec-inp" id="ec-prenom" type="text" autocomplete="given-name" placeholder="Jean"/>
+      </div>
+      <div class="ec-form-group">
+        <label class="ec-lbl" for="ec-nom">Nom <span class="ec-req">*</span></label>
+        <input class="ec-inp" id="ec-nom" type="text" autocomplete="family-name" placeholder="Dupont"/>
+      </div>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-email-reg">Adresse email <span class="ec-req">*</span></label>
+      <input class="ec-inp" id="ec-email-reg" type="email" autocomplete="email" placeholder="vous@exemple.com"/>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-tel-reg">Téléphone <span class="ec-req">*</span></label>
+      <input class="ec-inp" id="ec-tel-reg" type="tel" autocomplete="tel" placeholder="06 12 34 56 78"/>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-ref-dossier">Référence dossier</label>
+      <input class="ec-inp" id="ec-ref-dossier" type="text" placeholder="SWK-2026-XXXXX"/>
+      <span class="ec-field-note">Optionnel — figure sur votre courrier de bienvenue.</span>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-pwd-reg">Mot de passe <span class="ec-req">*</span></label>
+      <div class="ec-pwd-wrap">
+        <input class="ec-inp" id="ec-pwd-reg" type="password" autocomplete="new-password" placeholder="8 caractères minimum"/>
+        <button class="ec-eye-btn" type="button" onclick="ecTogglePwd('ec-pwd-reg', this)" aria-label="Afficher/masquer le mot de passe">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div class="ec-pwd-strength" id="ec-pwd-strength"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-pwd-confirm">Confirmer le mot de passe <span class="ec-req">*</span></label>
+      <div class="ec-pwd-wrap">
+        <input class="ec-inp" id="ec-pwd-confirm" type="password" autocomplete="new-password" placeholder="Retapez le mot de passe"/>
+        <button class="ec-eye-btn" type="button" onclick="ecTogglePwd('ec-pwd-confirm', this)" aria-label="Afficher/masquer le mot de passe">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <label class="ec-check-item" for="ec-cgu">
+      <input type="checkbox" id="ec-cgu"/>
+      <span class="ec-check-box"></span>
+      <span class="ec-check-txt">J'accepte les <a href="#" onclick="return false">Conditions Générales</a> et la <a href="#" onclick="return false">Politique de confidentialité</a>.</span>
+    </label>
+
+    <button class="ec-btn-primary" type="button" onclick="ecRegister()" style="margin-top:1.4rem">Créer mon compte</button>
+
+    <div class="ec-switch-link">Déjà inscrit ? <a href="connexion.html">Connectez-vous</a></div>
+  </div>
+
+  <div class="ec-auth-legal">
+    Vos données sont traitées de manière sécurisée et confidentielle.
+  </div>
+</div>
+
+<script src="espaceclient.js"></script>
+</body>
+</html>

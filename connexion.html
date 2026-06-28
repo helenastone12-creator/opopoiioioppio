@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Connexion — Swek</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="espaceclient.css"/>
+  <script>
+  (function(){
+    // Si déjà connecté, on va directement au tableau de bord.
+    if(localStorage.getItem('ec_session') === '1') location.replace('espaceclient.html');
+  })();
+  </script>
+</head>
+<body class="ec-body">
+
+<div class="ec-auth-wrap">
+  <a href="index.html" class="ec-auth-logo">Swek</a>
+  <div class="ec-auth-sub">Espace Client</div>
+
+  <div class="ec-auth-card">
+    <h1 class="ec-auth-title">Connexion</h1>
+    <p class="ec-auth-hint">Accédez à votre espace client sécurisé.</p>
+
+    <div class="ec-form-err" id="ec-login-err" style="display:none"></div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-email">Adresse email <span class="ec-req">*</span></label>
+      <input class="ec-inp" id="ec-email" type="email" autocomplete="email" placeholder="vous@exemple.com"/>
+    </div>
+
+    <div class="ec-form-group">
+      <label class="ec-lbl" for="ec-pwd">Mot de passe <span class="ec-req">*</span></label>
+      <div class="ec-pwd-wrap">
+        <input class="ec-inp" id="ec-pwd" type="password" autocomplete="current-password" placeholder="••••••••"/>
+        <button class="ec-eye-btn" type="button" onclick="ecTogglePwd('ec-pwd', this)" aria-label="Afficher/masquer le mot de passe">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <a href="#" class="ec-forgot" onclick="return false">Mot de passe oublié ?</a>
+
+    <button class="ec-btn-primary" type="button" onclick="ecLogin()">Se connecter</button>
+
+    <div class="ec-switch-link">Pas encore de compte ? <a href="inscription.html">Créez le vôtre</a></div>
+  </div>
+
+  <div class="ec-auth-legal">
+    En vous connectant, vous acceptez nos <a href="#" onclick="return false">Conditions Générales</a>
+    et notre <a href="#" onclick="return false">Politique de confidentialité</a>.
+  </div>
+</div>
+
+<script src="espaceclient.js"></script>
+</body>
+</html>
