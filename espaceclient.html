@@ -4,12 +4,11 @@
   <meta charset="utf-8"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mon espace client — Solfianza</title>
+  <title>Mon espace client — Swek</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/><noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/></noscript>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="espace-client.css"/>
+  <link rel="stylesheet" href="espaceclient.css"/>
 <script>
 (function(){
   var supported = ['en','de','es','it','nl','pl','sv'];
@@ -29,7 +28,7 @@
 
 <!-- Header -->
 <header class="ec-header">
-  <a href="index.html" class="ec-hd-logo">Solfianza</a>
+  <a href="index.html" class="ec-hd-logo">Swek</a>
   <div class="ec-hd-right">
     <!-- Cloche notifications -->
     <button class="ec-hd-bell" id="ec-hd-bell" onclick="ecOpenModal('alertes')" aria-label="Notifications">
@@ -113,7 +112,7 @@
     <div class="ec-credit-card-top">
       <div>
         <div class="ec-credit-type">Prêt personnel</div>
-        <div class="ec-credit-label">Réf. <span id="ec-credit-ref">SOF-2026-—</span></div>
+        <div class="ec-credit-label">Réf. <span id="ec-credit-ref">SWK-2026-—</span></div>
       </div>
       <div class="ec-credit-badge">En cours</div>
     </div>
@@ -216,7 +215,7 @@
 <!-- Navigation bas / Sidebar desktop -->
 <nav class="ec-bottom-nav">
   <div class="ec-sidebar-brand">
-    <a href="index.html" class="ec-sidebar-logo">Solfianza</a>
+    <a href="index.html" class="ec-sidebar-logo">Swek</a>
     <div class="ec-sidebar-tagline">Espace Client</div>
   </div>
   <div class="ec-sidebar-user-card" id="ec-sidebar-user-card">
@@ -228,7 +227,7 @@
   </div>
   <div class="ec-sidebar-divider"></div>
 
-  <a href="espace-client.html" class="ec-bnav-link active">
+  <a href="espaceclient.html" class="ec-bnav-link active">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Accueil</span>
     <div class="ec-bnav-dot"></div>
@@ -344,11 +343,11 @@
     </div>
     <div class="ec-modal-body">
       <div class="ec-rib-card">
-        <div class="ec-rib-bank-name">Solfianza</div>
+        <div class="ec-rib-bank-name">Swek</div>
         <div class="ec-rib-row"><span class="ec-rib-lbl">Titulaire</span><span class="ec-rib-val" id="ec-rib-titulaire">—</span></div>
         <div class="ec-rib-row"><span class="ec-rib-lbl">IBAN</span><span class="ec-rib-val ec-rib-mono" id="ec-rib-iban">—</span></div>
-        <div class="ec-rib-row"><span class="ec-rib-lbl">BIC</span><span class="ec-rib-val ec-rib-mono">SOFIFR2PXXX</span></div>
-        <div class="ec-rib-row" style="border-bottom:none"><span class="ec-rib-lbl">Banque</span><span class="ec-rib-val">Solfianza — Paris</span></div>
+        <div class="ec-rib-row"><span class="ec-rib-lbl">BIC</span><span class="ec-rib-val ec-rib-mono">SWEKFRPPXXX</span></div>
+        <div class="ec-rib-row" style="border-bottom:none"><span class="ec-rib-lbl">Banque</span><span class="ec-rib-val">Swek — Paris</span></div>
       </div>
       <div class="ec-rib-actions">
         <button class="ec-rib-copy-btn" onclick="ecCopyIban()">
@@ -437,6 +436,6 @@
   </div>
 </div>
 
-<script src="espace-client.js"></script>
+<script src="espaceclient.js"></script>
 </body>
 </html>

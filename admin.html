@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin — Solfianza</title>
+  <title>Admin — Swek</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#0d2748;min-height:100vh}
@@ -138,7 +138,7 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">Solfianza</div>
+    <div class="login-logo">Swek</div>
     <div class="login-sub">Panel Administrateur</div>
     <div style="font-size:1.1rem;font-weight:800;color:#0d2748;margin-bottom:1.5rem">Connexion sécurisée</div>
     <div class="login-err" id="login-err">Mot de passe incorrect.</div>
@@ -151,7 +151,7 @@
 <div id="admin-screen">
   <header class="adm-header">
     <div style="display:flex;align-items:center;gap:.8rem">
-      <div class="adm-logo">Solfianza</div>
+      <div class="adm-logo">Swek</div>
       <div class="adm-badge">ADMIN</div>
     </div>
     <button class="adm-logout" onclick="admLogout()">Déconnexion</button>
@@ -235,7 +235,7 @@
           <div class="adm-field"><div class="adm-field-lbl">Montant (€)</div>
             <input class="adm-field-inp" id="dep-amt" type="number" min="1" placeholder="Ex : 1500"/></div>
           <div class="adm-field"><div class="adm-field-lbl">Libellé</div>
-            <input class="adm-field-inp" id="dep-label" placeholder="Ex : Virement Solfianza"/></div>
+            <input class="adm-field-inp" id="dep-label" placeholder="Ex : Virement Swek"/></div>
           <div class="adm-modal-success" id="dep-ok">✓ Dépôt effectué avec succès.</div>
           <div class="adm-modal-err" id="dep-err"></div>
           <button class="adm-btn adm-btn--green" style="width:100%;border-radius:10px" onclick="opDeposit()">Effectuer le dépôt</button>
@@ -297,7 +297,7 @@
           <div class="adm-field"><div class="adm-field-lbl">Téléphone</div>
             <input class="adm-field-inp" id="edit-tel" placeholder="06 XX XX XX XX"/></div>
           <div class="adm-field"><div class="adm-field-lbl">N° dossier</div>
-            <input class="adm-field-inp" id="edit-ref" placeholder="SOF-2026-XXXXX"/></div>
+            <input class="adm-field-inp" id="edit-ref" placeholder="SWK-2026-XXXXX"/></div>
           <div class="adm-modal-success" id="edit-ok">✓ Informations mises à jour.</div>
           <div class="adm-modal-err" id="edit-err"></div>
           <button class="adm-btn" style="width:100%;border-radius:10px" onclick="opEditUser()">Enregistrer</button>
@@ -341,7 +341,7 @@
 </div>
 
 <script>
-var ADMIN_PWD = 'Solfianza2026!';
+var ADMIN_PWD = 'Swek2026!';
 var SESSION_KEY = 'adm_auth';
 var LOG_KEY = 'adm_log';
 
@@ -548,7 +548,7 @@ function showMsg(okId,errId,msg,isOk){
 function opDeposit(){
   var uid=document.getElementById('dep-id').value.trim();
   var amt=parseFloat(document.getElementById('dep-amt').value);
-  var label=(document.getElementById('dep-label').value.trim()||'Dépôt Solfianza');
+  var label=(document.getElementById('dep-label').value.trim()||'Dépôt Swek');
   if(!uid) return showMsg('dep-ok','dep-err','Identifiant requis.',false);
   if(!amt||amt<=0) return showMsg('dep-ok','dep-err','Montant invalide.',false);
   var c=findClientByUID(uid);
@@ -735,7 +735,7 @@ function admExportCSV(){
   var csv=rows.map(function(r){return r.map(function(v){return '"'+(v+'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download='clients_solfianza_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download='clients_swek_'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();
 }
 </script>
